@@ -1,0 +1,116 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('nero:server');
+var http = require('http');
+var websocketController = require('../controller/websocketController');//处理websocket的控制器
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+var io = require('socket.io')(server);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+//使用websocket的部分
+io.set('authorization', function (handshakeData, accept)
+{
+  //if (handshakeData.headers.cookie) {
+  //  handshakeData.cookie = cookie.parse(handshakeData.headers.cookie);
+  //  handshakeData.sessionID = connect.utils.parseSignedCookie(handshakeData.cookie['express.sid'], 'secret');
+  //  if (handshakeData.cookie['express.sid'] == handshakeData.sessionID) {
+  //    return accept('Cookie is invalid.', false);
+  //  }
+  //} else {
+  //  return accept('No cookie transmitted.', false);
+  //}
+  //这里可以通过cookie取得sessionId，然后在redis里取得session的值，若是session.user存在则证明用户已经登陆，若是不存在则证明用户未登录
+  //socket.loginStatus = true;
+  //console.log('under authorization');//在这里进行验证操作
+  accept(null, true);
+});
+
+io.on('connection', function(socket)
+{
+  //console.log(socket.request.headers.cookies);
+  //保存用户和socket的关系
+  socket.on('userLocation', websocketController.userLocation.bind(null, socket, io));//使用bind可以在回调中多传参数，作为函数的第一个值
+});
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

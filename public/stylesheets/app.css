@@ -1,0 +1,100 @@
+body {
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+    color: #00B7FF;
+}
+
+
+.iphoneBorder
+{
+    width: 300px;
+    height: 550px;
+    margin: 20px auto;
+    border: 1px solid #cfcfcf;
+    border-radius: 20px;
+}
+
+.spot{
+    font-size:20px;
+    padding-top: 5px;
+    text-align:center;
+    color: #2a2a2e;
+    text-decoration:none
+}
+
+.camera
+{
+    padding-left: 90px;
+    font-size:25px;
+}
+
+.Headset
+{
+    height: 3px;
+    padding-left: 25px;
+    font-size:30px;
+}
+
+.iphoneScreen
+{
+    width: 290px;
+    height: 400px;
+    margin: 20px auto 0;
+    border: 1px solid #eeeeee;
+    border-radius: 1px;
+    position: relative;
+}
+
+.screenHeader
+{
+    height: 13px;
+    margin-bottom: 5px;
+    background: url('/images/screenHeader.png') no-repeat;
+    background-size:contain;
+}
+
+#screenBody
+{
+    height: 380px;
+}
+
+.newJourney
+{
+    position: absolute;
+    top: 300px;
+    left: 85px;
+    width: 120px;
+    height: 35px;
+    background-color: #0062D8;
+    border-radius: 30px;
+    box-shadow: 2px 2px 2px #8F7657;
+    text-align: center;
+    line-height: 3;
+    font-size: 8px;
+    color: #fff;
+}
+
+.appNav
+{
+    position: absolute;
+    top: 360px;
+    width: 260px;
+    height: 20px;
+}
+
+
+.iphoneBottom div
+{
+    width: 30px;
+    height: 30px;
+    margin: 15px auto 0;
+    border: 2px solid #dddddd;
+    border-radius: 20px;
+}
+
+footer {
+    text-align: center;
+}

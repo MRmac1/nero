@@ -1,0 +1,81 @@
+.user-nav
+{
+    height: 35px;
+    text-align: center;
+    line-height: 2;
+    font-size: 16px;
+}
+
+.user-form
+{
+    /*background-color: rgb(255, 164, 72);*/
+    font: 12px/1.5 "Helvetica neue",Helvetica,Tahoma,"lantinghei sc","Microsoft Yahei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.user-warning
+{
+    transform:scale(0.875);
+    text-align: center;
+    line-height: 2;
+    font-size: 8px;
+    padding: 15px;
+    border-top: 1px solid #FFD8CA;
+    color: rgb(103, 8, 8);
+}
+
+.user-register
+{
+    margin: 30px 20px;
+}
+
+input[type="tel"]:focus {
+    border-bottom: solid 2px #969696;
+}
+
+input {
+    padding:5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+
+input[type='tel']
+{
+    border:1px solid rgb(133, 218, 123);
+    width: 65%;
+    margin-right: 5px;
+}
+
+input[type='button']
+{
+    border:1px solid rgb(133, 218, 123);
+    background-color: rgb(133, 218, 123);
+    margin-right: 5px;
+    width: 23%;
+}
+
+#ver-code
+{
+    margin-top: 15px;
+    width: 90%;
+}
+
+#submit
+{
+    margin-top: 15px;
+    width: 96%;
+}
+
+.user-notice
+{
+    transform:scale(0.875);
+    font-size: 8px;
+    padding-top: 15px;
+    line-height: 2;
+    text-align: left;
+}
+
+.user-law
+{
+    color: rgb(103, 8, 8);
+}

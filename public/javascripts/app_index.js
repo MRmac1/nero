@@ -24,7 +24,7 @@ map.plugin('AMap.Geolocation', function()
     });
     map.addControl(geoLocation);
     geoLocation.getCurrentPosition();
-    AMap.event.addListener(geoLocation, 'complete', onComplete);//返回定位信息
+    //AMap.event.addListener(geoLocation, 'complete', onComplete);//返回定位信息
     AMap.event.addListener(geoLocation, 'complete');//返回定位信息
     AMap.event.addListener(geoLocation, 'error', onError);      //返回定位出错信息
 });//用户初始定位

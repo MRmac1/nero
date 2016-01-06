@@ -48,6 +48,9 @@ exports.postRegister = function( req, res, next ) {
                     console.log('err'+err);
                     res.redirect('/user/register');
                 }
+
+
+
                 //先查询对应的手机号是否存在,若存在则直接写入session,若不存在则新注册用户
                 if ( doc.length == 0 ) {
                     var newUser = {phoneNum: phoneNum, ip: req.ip, nickName: '用户'+ phoneNum};

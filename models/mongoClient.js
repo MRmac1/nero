@@ -7,7 +7,7 @@ mongoose.connect(setting.mongoHost);
 
 var db = mongoose.connection;
 db.once('open', function(){
-    console.log('open');
+    console.log('open mongodb');
 });
 
 module.exports = {

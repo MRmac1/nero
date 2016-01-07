@@ -1,6 +1,9 @@
 /**
  * Created by mr_mac1 on 24/11/15.
  */
+
+var interests = require('../config/interests');
+
 //app首页，展示兴趣点设置
 exports.index = function( req, res, next ) {
     res.render('app_index', {});//传递经纬度
@@ -19,4 +22,8 @@ exports.count = function( req, res, next ) {
         sess.views = 1;
         res.end('welcome to the session demo. refresh!')
     }
+};
+
+exports.getDefinedInterests = function( req, res, next ) {
+    res.json(interests);
 };

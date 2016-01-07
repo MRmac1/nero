@@ -8,5 +8,6 @@ router.get('/', function(req, res, next) {
 });
 
 router.route('/count').get(indexController.count);//session 计数示范
+router.route('/getDefinedInterests').get(indexController.getDefinedInterests);//session 计数示范
 
 module.exports = router;

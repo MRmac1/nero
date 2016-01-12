@@ -1,11 +1,13 @@
 var mongo = require('./mongoClient');
+var utilTools = require('../util/util');
 
 var mongoose = mongo.mongoose;
 var db = mongo.db;
 
 var userSchema = new mongoose.Schema({
-    phoneNum: { type: Number, default:'' },
+    phoneNum: { type: String, default:'' },
     device: { type: String, default:'' }, //用户设备
+    mobileOperators: { type: String, default:'' }, //移动运营商
     udid: { type: String, default:'' },
     system: { type: String, default:'' },
     deviceType: { type: String, default:'' },
@@ -26,19 +28,10 @@ var userSchema = new mongoose.Schema({
         pushEnable: {type: Boolean, default: false}, //是否开启推送  默认不开启
         pushInterval: { type: Number, default:0 } //推送间隔时长
     }],
-    createDate : { type: Date, default:Date.now },
-    lastLogin : { type: Date, default:Date.now },
+    createDate : { type: String, default:utilTools.getCurrentDate() },
+    lastLogin : { type: String, default:utilTools.getCurrentDate() },
     ip : { type: String, default: '' }
 });
-
-//
-//var userModel = mongoose.model('user', userSchema);
-//var newUser = {phoneNum: '13262883990', device: 'iphone6', uuid:'testUdid',system:'ios 9.0.1',
-//    ip: '127.0.0.1'};
-//userModel.create(newUser, function(err, user) {
-//    console.log(user);
-//    console.log('back');
-//});
 
 userSchema.statics.showHook = function(fields, cb) {
     return this.find({ phoneNum: new RegExp(fields, 'i') }, cb);
@@ -48,3 +41,4 @@ var userModel = mongoose.model('users', userSchema);
 module.exports = userModel;//挂在自定义方法到对象上
 
 //db.disconnect();
+

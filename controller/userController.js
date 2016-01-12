@@ -3,7 +3,9 @@
  */
 var redis = require('../models/redisCache');
 var userModel = require('../models/userModel');
-var events = require('events');
+//var events = require('events');
+var eventproxy = require('eventproxy');//使用eventproxy控制异步流程
+var utilTools = require('../util/util');
 var errCode = require('../config/errorCode');
 
 exports.getLogin = function( req, res, next ) {
@@ -20,56 +22,59 @@ exports.getRegister = function( req, res, next ) {
 };
 
 exports.postRegister = function( req, res, next ) {
-    var emitEvent = new events.EventEmitter();
+
+    /*
+    *   用户登录/注册流程
+    *   1.检验客户端传来参数是否合法(phoneNum,ver-code,udid)
+    *   2.需要检验用户的手机号和验证码是否正确 --- 这里需要异步
+    *   3.已存在用户,则只进行登入操作,不存在用户创建用户.
+    * */
+    var ep = new eventproxy();
     var params = req.body;
     var phoneNum = params.phoneNum;
     //检查用户的可靠性,检查photoNum和uuid
-
-    if (!(phoneNum.length === 11)) {
-        //非手机号码 error 1002
-        var err = new Error(errCode[1002]);
-        err.status = 1002;
-        return next(err);
+    var phoneStatus = utilTools.checkPhoneNum(phoneNum);//手机号码状态,把隶属于那个运营商也写到user表里去
+    console.log(phoneStatus);
+    if ( phoneStatus.status == 'error' ) {
+        res.json(phoneStatus);
     }
 
     redis.get(phoneNum, function(err, value) {
-        if(err != null)
-        {
-            next(err); //抛出错误
-        }
-        emitEvent.emit('gotCache', value);
+        ep.emit('getVerCode',value);
     });
 
-    emitEvent.on('gotCache', function(value) {
-        if( value == params['ver-code']) {
-            //保存用户到数据库
-            userModel.find({phoneNum: phoneNum}, function(err, doc) {
-                if(err) {
-                    console.log('err'+err);
-                    res.redirect('/user/register');
-                }
-                //先查询对应的手机号是否存在,若存在则直接写入session,若不存在则新注册用户
-                if ( doc.length == 0 ) {
-                    var newUser = {phoneNum: phoneNum, ip: req.ip, nickName: '用户'+ phoneNum};
+    ep.once('getVerCode', function( verCode ) {
+        if( verCode == params['ver-code']){
+            userModel.find({phoneNum: phoneNum}, function(err, doc){
+                if (doc.length == 0){
+                    var date = utilTools.getCurrentDate();
+                    var newUser = {phoneNum: phoneNum, device: params['device'], mobileOperators: phoneStatus.mobileOperators,
+                        udid:params['udid'], system:params['system'], deviceType:params['deviceType'], createDate:date, lastLogin:date,
+                        ip:req.ip};
                     userModel.create(newUser, function(err, user) {
-                        req.session.user = user;
-                        emitEvent.emit('login', user);
+                        if (err){
+                            return next(err);//数据库错误
+                        }
+                        req.session.user = user;//写入session;
+                        ep.emit('login',doc);
                     });
                 }else {
+                    //更新用户的登陆时间
+                    userModel.update({_id:doc[0]._id}, {$set:{lastLogin:utilTools.getCurrentDate()}});
                     req.session.user = doc;
-                    emitEvent.emit('login', doc);
+                    ep.emit('login',doc);
                 }
             });
         }else {
-            //验证码错误的情况
-            res.json({status:'error'});
+            res.json({status:'error'});//验证码错误
         }
     });
-    //用户登录之后注册cookie等
-    emitEvent.on('login', function(value) {
+
+    ep.once('login', function(value) {
         res.cookie('user_id', value._id, { expires: new Date(Date.now() + 9000000), httpOnly: true });
         res.json({status:'ok'});
     });
+
 };
 
 exports.getVerifitionCode = function(req, res, next) {
@@ -79,3 +84,4 @@ exports.getVerifitionCode = function(req, res, next) {
     var status = { status: 'ok' };
     res.json(status);
 };
+

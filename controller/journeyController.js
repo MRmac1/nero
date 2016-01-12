@@ -20,10 +20,9 @@ exports.getJourney = function( req, res, next )
 
 exports.postJourney = function(req, res, next)
 {
-    //知道用户是谁
+    //知道用户是谁,客户端传udid过来
     var id = req.session.user._id;
-    var params = req.body; //destination-text=&walkAround=on&atm=on&addOil=on&interval=5&push-set=on
-
+    var params = req.body; //
     /*
     * line:[{longitude:Number, latitude:Number, posPoint:[{
      //商家的信息
@@ -46,6 +45,8 @@ exports.postJourney = function(req, res, next)
 
     var journeyPlan = {time: getNowFormatDate(), interests: interestSet,
         destination: params['destination-text'], pushEnable:params['interval'], pushInterval:params['interval']};
+
+
 
 
 

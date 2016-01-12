@@ -27,3 +27,9 @@ exports.count = function( req, res, next ) {
 exports.getDefinedInterests = function( req, res, next ) {
     res.json(interests);
 };
+
+
+exports.map = function( req, res, next ){
+    //开始一段旅程后的跟踪页
+    res.render('map', {});
+};

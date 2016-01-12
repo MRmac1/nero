@@ -2,10 +2,8 @@
  * Created by mr_mac1 on 26/11/15.
  */
 var map = new AMap.Map('screenBody', {zoom: 14, isHotspot:true}), //初始化地图
-    geoLocation = [], //用户的模拟路径
-    socket = io();//socket.io客户端
-//var marker = new AMap.Marker();
-//marker.setMap(map);
+    geoLocation = []; //用户的模拟路径
+var  socket = io();
 map.plugin(['AMap.ToolBar','AMap.Scale'],function(){
     var toolBar = new AMap.ToolBar();
     var scale = new AMap.Scale();
@@ -24,8 +22,6 @@ map.plugin('AMap.Geolocation', function()
     });
     map.addControl(geoLocation);
     geoLocation.getCurrentPosition();
-    //AMap.event.addListener(geoLocation, 'complete', onComplete);//返回定位信息
-    AMap.event.addListener(geoLocation, 'complete');//返回定位信息
     AMap.event.addListener(geoLocation, 'error', onError);      //返回定位出错信息
 });//用户初始定位
 
@@ -37,45 +33,7 @@ $('.newJourney').click(function() {
    location.href = '/journey'; //跳转到添加新旅程页面
 });
 
-var userLocations = initMoving();//定义一个模拟用户行走的二维数组
-
-//setTimeout(function(){map.panBy(50, 100);}, 5000)
-
-function initMoving()
+socket.on('location event', function(msg)
 {
-    var locations = [[113.932793,22.540515], [113.932798,22.540306], [113.932777,22.539955], [113.93245,22.539989],
-        [113.932106,22.540391], [113.932031,22.540782],[113.931441,22.540861], [113.931382,22.539216],
-        [113.93216,22.538374], [113.932106,22.537735],[113.932053,22.535931], [113.932187,22.533414]];//回家的路
-    return locations;
-}
-
-function onComplete()
-{
-    //定位成功后再开始模拟用户运动
-    var tepLocations = [];
-    userLocations.forEach(function(item, index)
-    {
-        setTimeout( function(){
-            //每隔3秒依据localtions绘制覆盖物
-            tepLocations.push(item);
-            socket.emit('userLocation', item);
-            //console.log("index:"+index+";item:"+item);
-            map.setCenter(item);
-            //绘制轨迹
-            var polyline = new AMap.Polyline({
-                map: map,
-                path: tepLocations,
-                strokeColor: "#00A",  //线颜色
-                strokeOpacity: 1,     //线透明度
-                strokeWeight: 3,      //线宽
-                strokeStyle: "solid"  //线样式
-            });
-            map.setFitView();
-            //启动websocket传送到后端，用户的地理位置
-        }, (index+1)*1000 + 2000);
-    });
-}
-
-socket.on('location event', function(msg){
     console.log(msg);
 });

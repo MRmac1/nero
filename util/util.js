@@ -91,3 +91,14 @@ exports.getCurrentDate = function() {
     clock += mm;
     return clock;
 };
+
+//随机生成手机验证码, 四位数字
+exports.generateVerCode = function() {
+
+    var code = "";
+    for (var i = 1 ; i <= 4; i++) {
+        var num = (Math.ceil(Math.random()*10)).toString();
+        code += num;
+    }
+    return code;
+};

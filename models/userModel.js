@@ -23,7 +23,7 @@ var userSchema = new mongoose.Schema({
         time: { type: Date, default:Date.now }, //记录 开始时间
         timeLast: { type: Number, default:0 },  //记录消耗时长
         distance: { type: Number, default:0 },  //记录行走
-        interests:[{interestType: String}], //用户设置的兴趣点
+        interests:[String], //用户设置的兴趣点
         destination: {type: String, default: ''}, //目的地设置
         pushEnable: {type: Boolean, default: false}, //是否开启推送  默认不开启
         pushInterval: { type: Number, default:0 } //推送间隔时长

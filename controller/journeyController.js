@@ -4,6 +4,9 @@
 
 var userModel = require('../models/userModel');
 var interests = require('../config/interests');
+var utilTools = require('../util/util');
+var mongoose = require('mongoose');
+var ObjectId = mongoose.Types.ObjectId;
 
 //创建旅程，设置旅程兴趣点控制器
 exports.getJourney = function( req, res, next )
@@ -20,69 +23,39 @@ exports.getJourney = function( req, res, next )
 
 exports.postJourney = function(req, res, next)
 {
-    //知道用户是谁,客户端传udid过来
-    var id = req.session.user._id;
-    var params = req.body; //
     /*
-    * line:[{longitude:Number, latitude:Number, posPoint:[{
-     //商家的信息
-     name: String,
-     poslng: Number,
-     poslat: Number,
-     type: Number  //商家类型
-     }]}],//经度-纬度 沿途的一些推送信息,
-     time: { type: Date, default:Date.now }, //记录 开始时间
-     timeLast: { type: Number, default:0 },  //记录消耗时长
-     distance: { type: Number, default:0 },  //记录行走
-     interests:[{interestType: String}], //用户设置的兴趣点
-     destination: {type: String, default: ''}, //目的地设置
-     pushEnable: {type: Boolean, default: false}, //是否开启推送  默认不开启
-     pushInterval: { type: Number, default:0 } //推送间隔时长
+    *  生成一段旅程
+    *  1. 过滤出要的参数, udid验证身份,
+    *
     * */
+    //知道用户是谁,客户端传udid过来
+    var id = req.session.user._id || req.body.udid;
+    var params = req.body; //
     var interestSet = checkInterests(params);
-
-    console.log(interestSet);
-
-    var journeyPlan = {time: getNowFormatDate(), interests: interestSet,
-        destination: params['destination-text'], pushEnable:params['interval'], pushInterval:params['interval']};
-
-
-
-
-
+    var journeyPlan = {line:[], time: utilTools.getCurrentDate(), interests: interestSet};
+    //向数据库添加一条设置信息
+    userModel.update({_id:ObjectId(id)}, {$push:{journeys:journeyPlan}}, function(err, raw) {
+        if (err) {
+            console.log('err : '+err);
+            res.json({status:'error'});
+        }
+        console.log("raw : "+raw);
+        res.json({status:'ok'});
+    });
 };
 
 //更新兴趣点设置
-exports.updateJourney = function()
-{
+exports.updateJourney = function() {
 
 };
 
 
 //删除一段旅程
-exports.deleteJourney = function()
-{
+exports.deleteJourney = function() {
 
 };
 
-function getNowFormatDate() {
-    var date = new Date();
-    var seperator1 = "-";
-    var seperator2 = ":";
-    var month = date.getMonth() + 1;
-    var strDate = date.getDate();
-    if (month >= 1 && month <= 9) {
-        month = "0" + month;
-    }
-    if (strDate >= 0 && strDate <= 9) {
-        strDate = "0" + strDate;
-    }
-    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
-        + " " + date.getHours() + seperator2 + date.getMinutes()
-        + seperator2 + date.getSeconds();
-    return currentdate;
-}
-
+//根据传入参数得到用户定制的兴趣点
 function checkInterests(params)
 {
     var checks = [];

@@ -6,15 +6,7 @@ var userModel = require('../models/userModel');
 //var events = require('events');
 var eventproxy = require('eventproxy');//使用eventproxy控制异步流程
 var utilTools = require('../util/util');
-var errCode = require('../config/errorCode');
-
-exports.getLogin = function( req, res, next ) {
-    res.end('hello user'); //登陆渲染页
-};
-
-exports.postLogin = function( req, res, next ) {
-    res.end('hello user'); //登陆验证逻辑
-};
+//var errCode = require('../config/errorCode');
 
 exports.getRegister = function( req, res, next ) {
     var pageInfo = { title :'请验证手机号码', warning : '为了方便记录每一次美好的出行，请验证手机', uuid : 'localmac'};
@@ -45,8 +37,8 @@ exports.postRegister = function( req, res, next ) {
 
     ep.once('getVerCode', function( verCode ) {
         if( verCode == params['ver-code']){
-            userModel.find({phoneNum: phoneNum}, function(err, doc){
-                if (doc.length == 0){
+            userModel.findOne({phoneNum: phoneNum}, function(err, doc){
+                if (doc == null){
                     var date = utilTools.getCurrentDate();
                     var newUser = {phoneNum: phoneNum, device: params['device'], mobileOperators: phoneStatus.mobileOperators,
                         udid:params['udid'], system:params['system'], deviceType:params['deviceType'], createDate:date, lastLogin:date,
@@ -60,8 +52,8 @@ exports.postRegister = function( req, res, next ) {
                     });
                 }else {
                     //更新用户的登陆时间
-                    userModel.update({_id:doc[0]._id}, {$set:{lastLogin:utilTools.getCurrentDate()}});
-                    req.session.user = doc;
+                    userModel.update({_id:doc._id}, {$set:{lastLogin:utilTools.getCurrentDate()}});
+                    req.session.user = doc;//上面查询应该只是findOne
                     ep.emit('login',doc);
                 }
             });
@@ -78,10 +70,18 @@ exports.postRegister = function( req, res, next ) {
 };
 
 exports.getVerifitionCode = function(req, res, next) {
+
     var phoneNum = req.body.phoneNum;
-    var VerifitionCode = 111111;
-    redis.set(phoneNum, VerifitionCode);
-    var status = { status: 'ok' };
-    res.json(status);
+    var VerifitionCode = utilTools.generateVerCode();
+    redis.set(phoneNum, VerifitionCode, function(err, reply) {
+        if(err) {
+            var status = { status: 'error', error_code: '', error_message: '验证码生成出错'};
+            res.json(status);
+        }
+        //console.log(reply);//reply : ok
+        //这里发送短信
+        var status = { status: 'ok', result: ''};
+        res.json(status);
+    });
 };
 

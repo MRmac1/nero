@@ -30,7 +30,7 @@ $("#submit").click(function()
         success: function (data) {
             var result = JSON.parse(data);
             if (result.status == 'ok') {
-                //window.location.href = '/map';
+                window.location.href = '/map';
             } else if(result.status == 'error'){
                 alert('error');
             }

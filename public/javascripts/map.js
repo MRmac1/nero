@@ -21,28 +21,32 @@ map.plugin('AMap.Geolocation', function()
     map.addControl(geoLocation);
     geoLocation.getCurrentPosition();
     AMap.event.addListener(geoLocation, 'complete', onComplete);//返回定位信息
-    //AMap.event.addListener(geoLocation, 'complete');//返回定位信息
     AMap.event.addListener(geoLocation, 'error', onError);      //返回定位出错信息
 });//用户初始定位
 
 
 var userLocations = initMoving();//定义一个模拟用户行走的二维数组
 
-//setTimeout(function(){map.panBy(50, 100);}, 5000)
-
 function initMoving()
 {
-    //var locations = [[113.932793,22.540515], [113.932798,22.540306], [113.932777,22.539955], [113.93245,22.539989],
-    //    [113.932106,22.540391], [113.932031,22.540782],[113.931441,22.540861], [113.931382,22.539216],
-    //    [113.93216,22.538374], [113.932106,22.537735],[113.932053,22.535931], [113.932187,22.533414]];//回家的路
-    var location = [113.932793,22.540515], locations = [];
+    var locations = [[113.932793,22.540515]];
     //模拟100个点,以供取用
     for (var i = 0; i < 100; i++) {
-        var tmplocation = [location[0] + 0.000011*i, location[1] + 0.000012*i];
+        var tmplocation = [locations[locations.length - 1][0] + getRandom(), locations[locations.length - 1][1] + getRandom()];
         locations.push(tmplocation);
     }
     return locations;
 }
+
+//得到类似0.000021的数
+function getRandom() {
+    var num = Math.ceil(Math.random() * 100);//1~100之间的数字
+    return num/10E5;
+}
+
+var id = '13262883995';
+//用户身份传入
+socket.emit('user', id);
 
 function onComplete()
 {
@@ -51,7 +55,6 @@ function onComplete()
     userLocations.forEach(function(item, index)
     {
         setTimeout( function(){
-            console.log(index);
             //每隔1秒依据localtions绘制覆盖物
             tepLocations.push(item);
             socket.emit('userLocation', item);
@@ -65,13 +68,13 @@ function onComplete()
                 strokeWeight: 3,      //线宽
                 strokeStyle: "solid"  //线样式
             });
-            map.setFitView();
+            //map.setFitView();
+            polyline.setMap(map);
             //启动websocket传送到后端，用户的地理位置
         }, (index+1)*1000 + 2000);//这里的原理是从2s开始,以后每1s都会有个setTimeout事件.
     });
 }
 
-socket.on('location event', function(msg)
-{
+socket.on('location event', function(msg) {
     console.log(msg);
 });

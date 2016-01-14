@@ -1,9 +1,7 @@
 /**
  * Created by mr_mac1 on 26/11/15.
  */
-var map = new AMap.Map('screenBody', {zoom: 14, isHotspot:true}), //初始化地图
-    geoLocation = []; //用户的模拟路径
-var  socket = io();
+var map = new AMap.Map('screenBody', {zoom: 14, isHotspot:true}); //初始化地图
 map.plugin(['AMap.ToolBar','AMap.Scale'],function(){
     var toolBar = new AMap.ToolBar();
     var scale = new AMap.Scale();
@@ -13,7 +11,7 @@ map.plugin(['AMap.ToolBar','AMap.Scale'],function(){
 
 map.plugin('AMap.Geolocation', function()
 {
-    geoLocation = new AMap.Geolocation({
+    var geoLocation = new AMap.Geolocation({
         enableHighAccuracy: true,//是否使用高精度定位，默认:true
         timeout: 10000,          //超过10秒后停止定位，默认：无穷大
         buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
@@ -31,9 +29,4 @@ function onError() {
 
 $('.newJourney').click(function() {
    location.href = '/journey'; //跳转到添加新旅程页面
-});
-
-socket.on('location event', function(msg)
-{
-    console.log(msg);
 });

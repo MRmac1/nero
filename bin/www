@@ -8,6 +8,8 @@ var app = require('../app');
 var debug = require('debug')('nero:server');
 var http = require('http');
 var websocketController = require('../controller/websocketController');//处理websocket的控制器
+//var cookie = require('../node_modules/cookie/index.js');
+var userModel = require('../models/userModel');//取用户设置的journey信息,即最新一条
 
 /**
  * Get port from environment and store in Express.
@@ -30,7 +32,7 @@ var io = require('socket.io')(server);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-//使用websocket的部分
+//使用websocket的部分, 验证,取出对应的数据挂载在
 io.set('authorization', function (handshakeData, accept)
 {
   //if (handshakeData.headers.cookie) {
@@ -42,17 +44,24 @@ io.set('authorization', function (handshakeData, accept)
   //} else {
   //  return accept('No cookie transmitted.', false);
   //}
-  //这里可以通过cookie取得sessionId，然后在redis里取得session的值，若是session.user存在则证明用户已经登陆，若是不存在则证明用户未登录
+  ////这里可以通过cookie取得sessionId，然后在redis里取得session的值，若是session.user存在则证明用户已经登陆，若是不存在则证明用户未登录
   //socket.loginStatus = true;
   //console.log('under authorization');//在这里进行验证操作
   accept(null, true);
+    console.log('auth');
 });
 
 io.on('connection', function(socket)
 {
   //console.log(socket.request.headers.cookies);
   //保存用户和socket的关系
-  socket.on('userLocation', websocketController.userLocation.bind(null, socket, io));//使用bind可以在回调中多传参数，作为函数的第一个值
+    console.log('connection');
+    socket.on('user', function(id) {
+        userModel.findOne({phoneNum: id}).select('journeys').exec(function(err, doc) {
+            console.log(doc);
+            socket.on('userLocation', websocketController.userLocation.bind(null, socket, io, doc));//使用bind可以在回调中多传参数，作为函数的第一个值
+        });
+    });
 });
 
 /**

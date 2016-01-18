@@ -3,10 +3,8 @@
  */
 var redis = require('../models/redisCache');
 var userModel = require('../models/userModel');
-//var events = require('events');
 var eventproxy = require('eventproxy');//使用eventproxy控制异步流程
 var utilTools = require('../util/util');
-//var errCode = require('../config/errorCode');
 
 exports.getRegister = function( req, res, next ) {
     var pageInfo = { title :'请验证手机号码', warning : '为了方便记录每一次美好的出行，请验证手机', uuid : 'localmac'};
@@ -26,7 +24,6 @@ exports.postRegister = function( req, res, next ) {
     var phoneNum = params.phoneNum;
     //检查用户的可靠性,检查photoNum和uuid
     var phoneStatus = utilTools.checkPhoneNum(phoneNum);//手机号码状态,把隶属于那个运营商也写到user表里去
-    console.log(phoneStatus);
     if ( phoneStatus.status == 'error' ) {
         res.json(phoneStatus);
     }
@@ -78,8 +75,6 @@ exports.getVerifitionCode = function(req, res, next) {
             var status = { status: 'error', error_code: '', error_message: '验证码生成出错'};
             res.json(status);
         }
-        //console.log(reply);//reply : ok
-        //这里发送短信
         var status = { status: 'ok', result: ''};
         res.json(status);
     });

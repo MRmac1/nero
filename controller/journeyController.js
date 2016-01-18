@@ -5,8 +5,12 @@
 var userModel = require('../models/userModel');
 var interests = require('../config/interests');
 var utilTools = require('../util/util');
-var mongoose = require('mongoose');
-var ObjectId = mongoose.Types.ObjectId;
+//var mongoose = require('mongoose');
+//var ObjectId = mongoose.Types.ObjectId;
+var async = require('async');
+var eventproxy = require('eventproxy');
+var ep = new eventproxy();
+
 
 //创建旅程，设置旅程兴趣点控制器
 exports.getJourney = function( req, res, next )
@@ -26,22 +30,59 @@ exports.postJourney = function(req, res, next)
     /*
     *  生成一段旅程
     *  1. 过滤出要的参数, udid验证身份,
-    *
     * */
-    //知道用户是谁,客户端传udid过来
-    var id = req.session.user._id || req.body.udid;
+    //客户端传udid和interests数组过来
+
     var params = req.body; //
-    var interestSet = checkInterests(params);
-    var journeyPlan = {line:[], time: utilTools.getCurrentDate(), interests: interestSet};
-    //向数据库添加一条设置信息
-    userModel.update({_id:ObjectId(id)}, {$push:{journeys:journeyPlan}}, function(err, raw) {
-        if (err) {
-            console.log('err : '+err);
-            res.json({status:'error'});
-        }
-        console.log("raw : "+raw);
-        res.json({status:'ok'});
+    //var interestSet = checkInterests(params);
+
+    //使用ep确保返回时间只会发生一次
+    ep.once('backJson', function(status) {
+        res.json(status);
     });
+
+    /*验证传入参数*/
+    if( !checkParams(params) ) {
+        ep.emit('backJson', {status:'error', error_message : '参数输入不合法'});
+    }
+
+    var udid = params.udid;
+    var interestSet = params.interests;
+
+
+    var journeyPlan = {line:[], time: utilTools.getCurrentDate(), interests: interestSet};
+    //向数据库添加一条设置信息,先查找,后添加
+    var tasks = [findByudid, updateJourney];
+    function findByudid(callback) {
+        userModel.find({udid: udid}).limit(1).exec(function( err, doc) {
+            if (err) callback(err);
+            if (doc.length == 0) {
+                callback(err);
+                ep.emit('backJson', {status:'error', error_message : '该用户不存在'});
+            }
+            callback(null, 1);
+        })
+    }
+
+    function updateJourney(callback) {
+        userModel.update({udid: udid}, {$push:{journeys:journeyPlan}}).limit(1).exec(function( err, modifyStatus) {
+            if (err) {
+                callback(err);
+            }
+            if (modifyStatus.nModified == 0) {
+                callback(err);
+                ep.emit('backJson', {status:'error', error_message : '添加设置信息失败'});
+            }
+            callback(null, 2);
+        })
+    }
+
+    async.series(tasks, function(err, result) {
+        if(err)console.error(err);
+        ep.emit('backJson', {status:'ok', error_message : '添加设置信息成功'});
+    });
+
+
 };
 
 //更新兴趣点设置
@@ -67,4 +108,14 @@ function checkInterests(params)
         });
     }
     return checks;
+}
+
+//检查传入参数 udid和interests
+function checkParams( params ) {
+
+    if( params.udid != undefined && ( typeof params.interests == 'object') ) {
+        return true;
+    }else {
+        return false;
+    }
 }

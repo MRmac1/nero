@@ -33,10 +33,6 @@ var userSchema = new mongoose.Schema({
     ip : { type: String, default: '' }
 });
 
-userSchema.statics.showHook = function(fields, cb) {
-    return this.find({ phoneNum: new RegExp(fields, 'i') }, cb);
-};
-
 var userModel = mongoose.model('users', userSchema);
 module.exports = userModel;//挂在自定义方法到对象上
 

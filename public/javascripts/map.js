@@ -31,7 +31,7 @@ function initMoving()
 {
     var locations = [[113.932793,22.540515]];
     //模拟100个点,以供取用
-    for (var i = 0; i < 100; i++) {
+    for (var i = 0; i < 10; i++) {
         var tmplocation = [locations[locations.length - 1][0] + getRandom(), locations[locations.length - 1][1] + getRandom()];
         locations.push(tmplocation);
     }
@@ -44,9 +44,9 @@ function getRandom() {
     return num/10E5;
 }
 
-var id = '13262883995';
+var udid = '13508699406';
 //用户身份传入
-socket.emit('user', id);
+socket.emit('user', udid);
 
 function onComplete()
 {
@@ -71,10 +71,11 @@ function onComplete()
             //map.setFitView();
             polyline.setMap(map);
             //启动websocket传送到后端，用户的地理位置
-        }, (index+1)*1000 + 2000);//这里的原理是从2s开始,以后每1s都会有个setTimeout事件.
+        }, (index+1)*3000 + 2000);//这里的原理是从2s开始,以后每1s都会有个setTimeout事件.
     });
 }
 
-socket.on('location event', function(msg) {
-    console.log(msg);
+socket.on('location event', function(data) {
+    var count = JSON.parse(data).count;
+    $('#toast').html('附近有'+count+'个您感兴趣的地点');
 });

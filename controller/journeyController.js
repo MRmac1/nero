@@ -16,8 +16,7 @@ var ep = new eventproxy();
 exports.getJourney = function( req, res, next )
 {
     //检测有没有登陆,未登录则调转到登陆页面
-    if( req.session.user == undefined ) {
-        console.log('no session');
+    if( req.cookies['connect.sid'] == undefined ) {
         return res.redirect('/user/register');
     }
     //展示兴趣点添加页面
@@ -42,13 +41,12 @@ exports.postJourney = function(req, res, next)
     });
 
     /*验证传入参数*/
-    if( !checkParams(params) ) {
-        ep.emit('backJson', {status:'error', error_message : '参数输入不合法'});
-    }
+    //if( !checkParams(params) ) {
+    //    ep.emit('backJson', {status:'error', error_message : '参数输入不合法'});
+    //}
 
     var udid = params.udid;
-    var interestSet = params.interests;
-
+    var interestSet = params['interests[]'];
 
     var journeyPlan = {line:[], time: utilTools.getCurrentDate(), interests: interestSet};
     //向数据库添加一条设置信息,先查找,后添加
@@ -113,9 +111,9 @@ function checkInterests(params)
 //检查传入参数 udid和interests
 function checkParams( params ) {
 
-    if( params.udid != undefined && ( typeof params.interests == 'object') ) {
-        return true;
-    }else {
-        return false;
-    }
+    //if( params.udid != undefined && ( typeof params.interests == 'object') ) {
+    //    return true;
+    //}else {
+    //    return false;
+    //}
 }

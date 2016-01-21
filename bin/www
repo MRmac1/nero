@@ -56,10 +56,11 @@ io.on('connection', function(socket)
   //console.log(socket.request.headers.cookies);
   //保存用户和socket的关系
     console.log('connection');
-    socket.on('user', function(id) {
-        userModel.findOne({phoneNum: id}).select('journeys').exec(function(err, doc) {
-            console.log(doc);
-            socket.on('userLocation', websocketController.userLocation.bind(null, socket, io, doc));//使用bind可以在回调中多传参数，作为函数的第一个值
+    socket.on('user', function(udid) {
+        userModel.findOne({udid: udid}).select('journeys').exec(function(err, doc) {
+            //得到doc是一个journeys数组
+            var set = doc.journeys.pop();
+            socket.on('userLocation', websocketController.userLocation.bind(null, socket, io, set));//使用bind可以在回调中多传参数，作为函数的第一个值
         });
     });
 });

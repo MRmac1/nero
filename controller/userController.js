@@ -22,6 +22,7 @@ exports.postRegister = function( req, res, next ) {
     var ep = new eventproxy();
     var params = req.body;
     var phoneNum = params.phoneNum;
+    var udid = params.phoneNum;
     //检查用户的可靠性,检查photoNum和uuid
     var phoneStatus = utilTools.checkPhoneNum(phoneNum);//手机号码状态,把隶属于那个运营商也写到user表里去
     if ( phoneStatus.status == 'error' ) {
@@ -38,19 +39,19 @@ exports.postRegister = function( req, res, next ) {
                 if (doc == null){
                     var date = utilTools.getCurrentDate();
                     var newUser = {phoneNum: phoneNum, device: params['device'], mobileOperators: phoneStatus.mobileOperators,
-                        udid:params['udid'], system:params['system'], deviceType:params['deviceType'], createDate:date, lastLogin:date,
+                        udid: udid, system:params['system'], deviceType:params['deviceType'], createDate:date, lastLogin:date,
                         ip:req.ip};
                     userModel.create(newUser, function(err, user) {
                         if (err){
                             return next(err);//数据库错误
                         }
-                        req.session.user = user;//写入session;
+                        //req.session.user = user;//写入session;
                         ep.emit('login',doc);
                     });
                 }else {
                     //更新用户的登陆时间
                     userModel.update({_id:doc._id}, {$set:{lastLogin:utilTools.getCurrentDate()}});
-                    req.session.user = doc;//上面查询应该只是findOne
+                    //req.session.user = doc;//上面查询应该只是findOne
                     ep.emit('login',doc);
                 }
             });
@@ -69,7 +70,8 @@ exports.postRegister = function( req, res, next ) {
 exports.getVerifitionCode = function(req, res, next) {
 
     var phoneNum = req.body.phoneNum;
-    var VerifitionCode = utilTools.generateVerCode();
+    //var VerifitionCode = utilTools.generateVerCode(); //生成四位随机数
+    var VerifitionCode = 1111;
     redis.set(phoneNum, VerifitionCode, function(err, reply) {
         if(err) {
             var status = { status: 'error', error_code: '', error_message: '验证码生成出错'};

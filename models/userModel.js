@@ -26,7 +26,8 @@ var userSchema = new mongoose.Schema({
         interests:[String], //用户设置的兴趣点
         destination: {type: String, default: ''}, //目的地设置
         pushEnable: {type: Boolean, default: false}, //是否开启推送  默认不开启
-        pushInterval: { type: Number, default:0 } //推送间隔时长
+        pushInterval: { type: Number, default:0 }, //推送间隔时长
+        status: {type: Boolean, default: true} //这段路途是否完成
     }],
     createDate : { type: String, default:utilTools.getCurrentDate() },
     lastLogin : { type: String, default:utilTools.getCurrentDate() },

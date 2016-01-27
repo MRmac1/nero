@@ -77,6 +77,22 @@ a {
     color: #fff;
 }
 
+.finishJourney
+{
+    position: absolute;
+    top: 30px;
+    left: 220px;
+    width: 60px;
+    height: 35px;
+    background-color: #0062D8;
+    border-radius: 30px;
+    box-shadow: 2px 2px 2px #8F7657;
+    text-align: center;
+    line-height: 3;
+    font-size: 8px;
+    color: #fff;
+}
+
 .appNav
 {
     position: absolute;

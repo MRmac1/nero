@@ -31,24 +31,16 @@ exports.postJourney = function(req, res, next)
     *  1. 过滤出要的参数, udid验证身份,
     * */
     //客户端传udid和interests数组过来
-
     var params = req.body; //
-    //var interestSet = checkInterests(params);
 
     //使用ep确保返回时间只会发生一次
     ep.once('backJson', function(status) {
         res.json(status);
     });
-
-    /*验证传入参数*/
-    //if( !checkParams(params) ) {
-    //    ep.emit('backJson', {status:'error', error_message : '参数输入不合法'});
-    //}
-
     var udid = params.udid;
-    var interestSet = params['interests[]'];
+    var interestSet = params['interests'];
 
-    var journeyPlan = {line:[], time: utilTools.getCurrentDate(), interests: interestSet};
+    var journeyPlan = {line:[], time: utilTools.getCurrentDate(), interests: interestSet, status: false};
     //向数据库添加一条设置信息,先查找,后添加
     var tasks = [findByudid, updateJourney];
     function findByudid(callback) {
@@ -94,6 +86,17 @@ exports.deleteJourney = function() {
 
 };
 
+//完成一段旅程
+exports.finishJourney = function() {
+
+};
+
+//获取兴趣点参数
+exports.getDefinedInterests = function( req, res, next ) {
+    res.json({status:'ok', result:interests});
+};
+
+
 //根据传入参数得到用户定制的兴趣点
 function checkInterests(params)
 {
@@ -106,14 +109,4 @@ function checkInterests(params)
         });
     }
     return checks;
-}
-
-//检查传入参数 udid和interests
-function checkParams( params ) {
-
-    //if( params.udid != undefined && ( typeof params.interests == 'object') ) {
-    //    return true;
-    //}else {
-    //    return false;
-    //}
 }

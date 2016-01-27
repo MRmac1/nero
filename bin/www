@@ -56,11 +56,16 @@ io.on('connection', function(socket)
   //console.log(socket.request.headers.cookies);
   //保存用户和socket的关系
     console.log('connection');
-    socket.on('user', function(udid) {
+    socket.on('login', function(udid) {
         userModel.findOne({udid: udid}).select('journeys').exec(function(err, doc) {
-            //得到doc是一个journeys数组
-            var set = doc.journeys.pop();
-            socket.on('userLocation', websocketController.userLocation.bind(null, socket, io, set));//使用bind可以在回调中多传参数，作为函数的第一个值
+            if( !doc ) {
+                var result = {status:'error', error_message:'用户不存在'};
+                socket.emit('loginFail', result);
+            }else {
+                //得到doc是一个journeys数组
+                var set = doc.journeys.pop();
+                socket.on('userLocation', websocketController.userLocation.bind(null, socket, io, set));//使用bind可以在回调中多传参数，作为函数的第一个值
+            }
         });
     });
 });

@@ -46,7 +46,11 @@ function getRandom() {
 
 var udid = '13508699406';
 //用户身份传入
-socket.emit('user', udid);
+socket.emit('login', udid);
+
+socket.on('loginFail', function( result ) {
+    console.log(result);
+});
 
 function onComplete()
 {
@@ -57,7 +61,7 @@ function onComplete()
         setTimeout( function(){
             //每隔1秒依据localtions绘制覆盖物
             tepLocations.push(item);
-            socket.emit('userLocation', item);
+            socket.emit('userLocation', {pos:item, posNeed:true});
             map.setCenter(item);
             //绘制轨迹
             var polyline = new AMap.Polyline({
@@ -75,7 +79,13 @@ function onComplete()
     });
 }
 
-socket.on('location event', function(data) {
+socket.on('aroundyou', function(data) {
     var count = JSON.parse(data).count;
     $('#toast').html('附近有'+count+'个您感兴趣的地点');
+});
+
+
+//结束旅程
+$('.finishJourney').click(function() {
+    //$.get('/journey/finish');//发出一条记录
 });

@@ -7,4 +7,6 @@ var journeyController = require('../controller/journeyController');
 /* GET users listing. */
 
 router.route('/').get(journeyController.getJourney).post(journeyController.postJourney);
+router.route('/finish').get(journeyController.finishJourney);
+router.route('/getDefinedInterests').get(journeyController.getDefinedInterests);
 module.exports = router;

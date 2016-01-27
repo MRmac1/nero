@@ -47,7 +47,7 @@ exports.checkPhoneNum = function( phoneNum ) {
     //若是都不匹配则result为空, 使用for in判断
     if ( isEmptyObject(result) ) {
         result.status = 'error';
-        result.mobileOperators = '手机格式非大陆格式';
+        result.error_message = '手机格式非大陆格式';
     }
     return result;
 };

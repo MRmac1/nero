@@ -5,7 +5,7 @@ module.exports =
 {
     amap: {
         key: 'db45f615ca2c929e6c51fb67fc241088',
-        radius: 5000,
+        radius: 1000,
         sortrule: 'distance', //按照amap的weight规则排序
         extensions: 'base',
         output: 'json'

@@ -16,7 +16,7 @@ var ep = new eventproxy();
 exports.getJourney = function( req, res, next )
 {
     //检测有没有登陆,未登录则调转到登陆页面
-    if( req.cookies['user_id'] == undefined ) {
+    if( req.cookies['udid'] == undefined ) {
         return res.redirect('/user/register');
     }
     //展示兴趣点添加页面

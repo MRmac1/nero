@@ -22,7 +22,8 @@ exports.postRegister = function( req, res, next ) {
     var ep = new eventproxy();
     var params = req.body;
     var phoneNum = params.phoneNum;
-    var udid = params.udid;
+    //var udid = params.udid;
+    var udid = phoneNum;
     //检查用户的可靠性,检查photoNum和uuid
     var phoneStatus = utilTools.checkPhoneNum(phoneNum);//手机号码状态,把隶属于那个运营商也写到user表里去
     if ( phoneStatus.status == 'error' ) {
@@ -43,14 +44,18 @@ exports.postRegister = function( req, res, next ) {
                         ip:req.ip};
                     userModel.create(newUser, function(err, user) {
                         if (err){
-                            return next(err);//数据库错误
+                            return next(err);//数据库错误 继续向下一步传递
                         }
                         ep.emit('login',doc);
                     });
                 }else {
                     //更新用户的登陆时间
-                    userModel.update({udid:doc.udid}, {$set:{lastLogin:utilTools.getCurrentDate()}});
-                    ep.emit('login',doc);
+                    userModel.update({udid:doc.udid}, {$set:{lastLogin:utilTools.getCurrentDate()}}, function(err, status) {
+                        if (err) throw err;
+                        if (status.ok == 1) {
+                            ep.emit('login',doc);
+                        }
+                    });
                 }
             });
         }else {
@@ -59,6 +64,7 @@ exports.postRegister = function( req, res, next ) {
     });
 
     ep.once('login', function(value) {
+        res.cookie('udid', value.udid, { maxAge:900000 });
         //传入对应user信息
         res.json({status:'ok', result:value});
     });
@@ -78,4 +84,3 @@ exports.getVerifitionCode = function(req, res, next) {
         res.json(status);
     });
 };
-

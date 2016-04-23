@@ -33,7 +33,7 @@ $.get('/getDefinedInterests').done(function(data) {
 
 $("#submit").click(function()
 {
-    var udid = '13508699406'; //暂时写死
+    var udid = '13262883995'; //暂时写死
     var checked = ['中餐', '洗浴']; //暂时写死
     var options = {
         url: '/journey',

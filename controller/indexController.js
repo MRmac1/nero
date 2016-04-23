@@ -6,6 +6,7 @@ var interests = require('../config/interests');
 
 //app首页，展示兴趣点设置
 exports.index = function( req, res, next ) {
+    console.log(123);
     res.render('app_index', {});//传递经纬度
 };
 
